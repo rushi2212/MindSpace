@@ -1,0 +1,115 @@
+# Dependencies
+node_modules/
+backend/.venv/
+backend/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+frontend/.env
+
+# Build outputs
+frontend/dist/
+frontend/build/
+backend/dist/
+backend/build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+logs/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+backend.db
+backend/*.db
+backend/*.sqlite
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.parcel-cache/
+
+# Coverage reports
+coverage/
+*.lcov
+.nyc_output/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Python specific
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# FastAPI specific
+*.pyc
+.pytest_cache/
+
+# AI/ML model files (if any)
+*.pkl
+*.pt
+*.pth
+*.h5
+*.onnx
+
+# Local configuration
+config.local.js
+config.local.json

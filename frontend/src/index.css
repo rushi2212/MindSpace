@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-gray-100 min-h-screen;
+  }
+
+  h1 {
+    @apply text-4xl font-bold;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-success {
+    @apply px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  .card {
+    @apply bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200;
+  }
+
+  .message-user {
+    @apply inline-block px-4 py-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg max-w-xs;
+  }
+
+  .message-ai {
+    @apply inline-block px-4 py-2 rounded-2xl bg-slate-700 text-gray-100 shadow-lg max-w-xs;
+  }
+}
+
+a {
+  @apply font-medium text-indigo-400 hover:text-indigo-300 transition-colors;
+}
