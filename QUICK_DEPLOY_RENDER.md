@@ -19,7 +19,7 @@ Visit: https://render.com and sign in with GitHub
 **Basic:**
 - Name: `mindspace-frontend`
 - Branch: `main`
-- Root Directory: `frontend`
+- Root Directory: `frontend` ⚠️ **No trailing spaces!**
 
 **Build:**
 - Build Command: `npm install && npm run build`
