@@ -3,6 +3,13 @@ const API = axios.create({ baseURL: "http://localhost:5000/api" });
 
 export const sendMessage = (message) => API.post("/ai/chat", { message });
 export const generateArt = (prompt) => API.post("/ai/art", { prompt });
+export const generateAudio = (text, options = {}) =>
+  API.post("/media/audio", {
+    text,
+    generate_content:
+      options.generateContent !== undefined ? options.generateContent : true,
+  });
+export const generateMindMap = (topic) => API.post("/media/mindmap", { topic });
 export const fetchTasks = (userId) => API.get(`/tasks/${userId}`);
 // Expecting { title, user_id }
 export const addTask = ({ title, user_id }) =>

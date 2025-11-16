@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from .db import init_db
-from .routers import ai, tasks
+from .routers import ai, tasks, media
 
 load_dotenv()
 
@@ -24,6 +24,7 @@ init_db()
 # Routers
 app.include_router(ai.router)
 app.include_router(tasks.router)
+app.include_router(media.router)
 
 
 @app.get("/")
