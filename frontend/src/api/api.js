@@ -1,5 +1,10 @@
 import axios from "axios";
-const API = axios.create({ baseURL: "http://localhost:5000/api" });
+
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const API = axios.create({ baseURL: API_BASE_URL });
 
 export const sendMessage = (message) => API.post("/ai/chat", { message });
 export const generateArt = (prompt) => API.post("/ai/art", { prompt });

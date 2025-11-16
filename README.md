@@ -6,6 +6,12 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
+## 🚀 Quick Links
+
+- **[Deployment Guide](./DEPLOYMENT.md)** - Complete guide for deploying to Vercel, Render, Railway, or Docker
+- **[Live Demo](#)** - Coming soon!
+- **[Documentation](./README.md)** - This file
+
 ## ✨ Features
 
 - **🤖 AI Chat Interface**: Interactive chat with AI assistant powered by Google Gemini
