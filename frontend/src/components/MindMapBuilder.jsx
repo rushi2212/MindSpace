@@ -455,8 +455,8 @@ const MindMapBuilder = () => {
   return (
     <div className="flex flex-col h-full w-full bg-slate-900">
       {/* Top Toolbar - AI Generator & Controls */}
-      <div className="bg-slate-800 border-b border-slate-700 p-2 md:p-4 w-full">
-        <div className="flex gap-2 md:gap-4 items-start flex-wrap w-full">
+      <div className="bg-slate-800 border-b border-slate-700 p-2 md:p-4">
+        <div className="flex gap-2 md:gap-4 items-start flex-wrap">
           {/* AI Mind Map Generator */}
           <div className="flex gap-2 w-full md:w-auto">
             <div className="flex-1">
@@ -546,98 +546,62 @@ const MindMapBuilder = () => {
       </div>
 
       {/* Main Canvas Area */}
-      <div
-        className="flex-1 relative overflow-hidden w-full"
-        ref={reactFlowWrapper}
-      >
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onInit={(instance) => {
-            setReactFlowInstance(instance);
-            // Fit view with generous padding to show whole diagram
-            setTimeout(() => {
-              instance.fitView({ padding: 0.2, duration: 300 });
-            }, 100);
-          }}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onNodeClick={onNodeClick}
-          nodeTypes={nodeTypes}
-          defaultEdgeOptions={{
-            type: "smoothstep",
-            animated: true,
-            style: { stroke: "#64748b", strokeWidth: 2 },
-            markerEnd: { type: MarkerType.ArrowClosed, color: "#64748b" },
-          }}
-          fitView
-          fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
-          minZoom={0.1}
-          maxZoom={2}
-          defaultZoom={0.8}
-          className="bg-slate-900"
-        >
-          <Background color="#334155" gap={16} />
-          <Controls className="bg-slate-800 border border-slate-700" />
-          <MiniMap
-            className="bg-slate-800 border border-slate-700"
-            nodeColor={(node) => {
-              switch (node.type) {
-                case "topicNode":
-                  return "#a855f7";
-                case "ideaNode":
-                  return "#06b6d4";
-                case "processNode":
-                  return "#10b981";
-                case "decisionNode":
-                  return "#f59e0b";
-                default:
-                  return "#64748b";
-              }
+      <div className="flex-1 flex relative overflow-hidden">
+        <div className="flex-1 relative" ref={reactFlowWrapper}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onInit={(instance) => {
+              setReactFlowInstance(instance);
+              // Fit view with generous padding to show whole diagram
+              setTimeout(() => {
+                instance.fitView({ padding: 0.2, duration: 300 });
+              }, 100);
             }}
-          />
-        </ReactFlow>
-
-        {/* Bottom Toolbar - Node Types */}
-        <div className="absolute bottom-2 md:bottom-4 left-0 right-0 z-20 px-2 md:px-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-2 md:p-3 overflow-x-auto">
-            <div className="flex gap-2 md:gap-3 items-center min-w-max">
-              <span className="text-white font-bold text-xs md:text-sm whitespace-nowrap">
-                📦 Node Types:
-              </span>
-              <DraggableNodeCard
-                type="topicNode"
-                icon="🎯"
-                label="Topic"
-                color="bg-linear-to-br from-purple-600 to-pink-600"
-              />
-              <DraggableNodeCard
-                type="ideaNode"
-                icon="💡"
-                label="Idea"
-                color="bg-linear-to-br from-cyan-600 to-blue-600"
-              />
-              <DraggableNodeCard
-                type="processNode"
-                icon="⚙️"
-                label="Process"
-                color="bg-linear-to-br from-emerald-600 to-teal-600"
-              />
-              <DraggableNodeCard
-                type="decisionNode"
-                icon="❓"
-                label="Decision"
-                color="bg-linear-to-br from-amber-600 to-orange-600"
-              />
-            </div>
-          </div>
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onNodeClick={onNodeClick}
+            nodeTypes={nodeTypes}
+            defaultEdgeOptions={{
+              type: "smoothstep",
+              animated: true,
+              style: { stroke: "#64748b", strokeWidth: 2 },
+              markerEnd: { type: MarkerType.ArrowClosed, color: "#64748b" },
+            }}
+            fitView
+            fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
+            minZoom={0.1}
+            maxZoom={2}
+            defaultZoom={0.8}
+            className="bg-slate-900"
+          >
+            <Background color="#334155" gap={16} />
+            <Controls className="bg-slate-800 border border-slate-700" />
+            <MiniMap
+              className="bg-slate-800 border border-slate-700"
+              nodeColor={(node) => {
+                switch (node.type) {
+                  case "topicNode":
+                    return "#a855f7";
+                  case "ideaNode":
+                    return "#06b6d4";
+                  case "processNode":
+                    return "#10b981";
+                  case "decisionNode":
+                    return "#f59e0b";
+                  default:
+                    return "#64748b";
+                }
+              }}
+            />
+          </ReactFlow>
         </div>
 
-        {/* Right Sidebar - Node Editor */}
-        <div className="hidden lg:block absolute top-0 right-0 bottom-0 w-72 bg-slate-800 border-l border-slate-700 p-4 overflow-y-auto z-10">
+        {/* Right Sidebar - Node Editor (Desktop Only) */}
+        <div className="hidden lg:block w-72 bg-slate-800 border-l border-slate-700 p-4 overflow-y-auto">
           <h3 className="text-white font-bold text-sm mb-4">✏️ Node Editor</h3>
 
           {selectedNode ? (
@@ -702,6 +666,104 @@ const MindMapBuilder = () => {
                     {selectedNode.position.y.toFixed(0)})
                   </p>
                 </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-gray-400 text-xs text-center py-8">
+              <div className="text-2xl mb-2">👆</div>
+              <p>Click a node to edit</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Bottom Section - Node Types & Editor */}
+      <div className="lg:hidden bg-slate-800 border-t border-slate-700">
+        {/* Node Types */}
+        <div className="p-3 border-b border-slate-700">
+          <h3 className="text-white font-bold text-xs mb-2">📦 Node Types</h3>
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            <DraggableNodeCard
+              type="topicNode"
+              icon="🎯"
+              label="Topic"
+              color="bg-linear-to-br from-purple-600 to-pink-600"
+            />
+            <DraggableNodeCard
+              type="ideaNode"
+              icon="💡"
+              label="Idea"
+              color="bg-linear-to-br from-cyan-600 to-blue-600"
+            />
+            <DraggableNodeCard
+              type="processNode"
+              icon="⚙️"
+              label="Process"
+              color="bg-linear-to-br from-emerald-600 to-teal-600"
+            />
+            <DraggableNodeCard
+              type="decisionNode"
+              icon="❓"
+              label="Decision"
+              color="bg-linear-to-br from-amber-600 to-orange-600"
+            />
+          </div>
+        </div>
+
+        {/* Node Editor */}
+        <div className="p-4 max-h-64 overflow-y-auto">
+          <h3 className="text-white font-bold text-sm mb-4">✏️ Node Editor</h3>
+
+          {selectedNode ? (
+            <div className="space-y-4">
+              <div>
+                <label className="text-gray-300 text-xs block mb-2">
+                  Node Type
+                </label>
+                <div className="px-3 py-2 bg-slate-700 rounded text-gray-300 text-xs">
+                  {selectedNode.type}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-gray-300 text-xs block mb-2">
+                  Label
+                </label>
+                <input
+                  type="text"
+                  value={nodeLabel}
+                  onChange={(e) => setNodeLabel(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-cyan-500 focus:outline-none text-xs"
+                  placeholder="Node label..."
+                />
+              </div>
+
+              <div>
+                <label className="text-gray-300 text-xs block mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={nodeDescription}
+                  onChange={(e) => setNodeDescription(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-cyan-500 focus:outline-none resize-none text-xs"
+                  rows="2"
+                  placeholder="Optional description..."
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={updateNode}
+                  className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 text-xs font-semibold"
+                >
+                  ✓ Update
+                </button>
+                <button
+                  onClick={deleteNode}
+                  className="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-700 text-xs"
+                >
+                  🗑️
+                </button>
               </div>
             </div>
           ) : (
