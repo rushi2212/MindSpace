@@ -19,22 +19,55 @@ const BrainCanvas = () => {
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    // Set canvas size
-    canvas.width = canvas.offsetWidth;
-    canvas.height = 600;
 
-    // Set default styles
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    // Set canvas size with proper scaling for mobile
+    const setCanvasSize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const scale = window.devicePixelRatio || 1;
 
-    // Dark background
-    ctx.fillStyle = "#1e293b";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Set actual size in memory (scaled for retina displays)
+      canvas.width = rect.width * scale;
+      canvas.height = 600 * scale;
+
+      // Scale context to match device pixel ratio
+      ctx.scale(scale, scale);
+
+      // Set default styles
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      // Dark background
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(0, 0, rect.width, 600);
+    };
+
+    setCanvasSize();
 
     // Save initial state
     const imageData = canvas.toDataURL();
     setHistory([imageData]);
     setHistoryStep(0);
+
+    // Handle window resize
+    const handleResize = () => {
+      const currentImageData = canvas.toDataURL();
+      setCanvasSize();
+      // Restore previous drawing after resize
+      const img = new Image();
+      img.src = currentImageData;
+      img.onload = () => {
+        ctx.drawImage(
+          img,
+          0,
+          0,
+          canvas.width / (window.devicePixelRatio || 1),
+          600
+        );
+      };
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const saveToHistory = () => {
@@ -253,7 +286,7 @@ const BrainCanvas = () => {
       </div>
 
       {/* Canvas */}
-      <div className="relative border-2 border-slate-700 rounded-lg overflow-hidden">
+      <div className="relative border-2 border-slate-700 rounded-lg overflow-hidden w-full">
         <canvas
           ref={canvasRef}
           onMouseDown={startDrawing}
@@ -263,8 +296,8 @@ const BrainCanvas = () => {
           onTouchStart={startDrawing}
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
-          className="cursor-crosshair w-full"
-          style={{ touchAction: "none" }}
+          className="cursor-crosshair block w-full"
+          style={{ touchAction: "none", height: "600px" }}
         />
 
         {/* Sticky Notes Overlay */}

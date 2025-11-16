@@ -455,8 +455,8 @@ const MindMapBuilder = () => {
   return (
     <div className="flex flex-col h-full w-full bg-slate-900">
       {/* Top Toolbar - AI Generator & Controls */}
-      <div className="bg-slate-800 border-b border-slate-700 p-2 md:p-4">
-        <div className="flex gap-2 md:gap-4 items-start flex-wrap">
+      <div className="bg-slate-800 border-b border-slate-700 p-2 md:p-4 w-full">
+        <div className="flex gap-2 md:gap-4 items-start flex-wrap w-full">
           {/* AI Mind Map Generator */}
           <div className="flex gap-2 w-full md:w-auto">
             <div className="flex-1">
@@ -546,7 +546,10 @@ const MindMapBuilder = () => {
       </div>
 
       {/* Main Canvas Area */}
-      <div className="flex-1 relative overflow-hidden" ref={reactFlowWrapper}>
+      <div
+        className="flex-1 relative overflow-hidden w-full"
+        ref={reactFlowWrapper}
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -599,35 +602,37 @@ const MindMapBuilder = () => {
         </ReactFlow>
 
         {/* Bottom Toolbar - Node Types */}
-        <div className="absolute bottom-2 md:bottom-4 left-2 md:left-4 right-2 md:right-4 z-20 bg-slate-800 border border-slate-700 rounded-lg p-2 md:p-3 overflow-x-auto">
-          <div className="flex gap-2 md:gap-3 items-center min-w-max">
-            <span className="text-white font-bold text-xs md:text-sm whitespace-nowrap">
-              📦 Node Types:
-            </span>
-            <DraggableNodeCard
-              type="topicNode"
-              icon="🎯"
-              label="Topic"
-              color="bg-linear-to-br from-purple-600 to-pink-600"
-            />
-            <DraggableNodeCard
-              type="ideaNode"
-              icon="💡"
-              label="Idea"
-              color="bg-linear-to-br from-cyan-600 to-blue-600"
-            />
-            <DraggableNodeCard
-              type="processNode"
-              icon="⚙️"
-              label="Process"
-              color="bg-linear-to-br from-emerald-600 to-teal-600"
-            />
-            <DraggableNodeCard
-              type="decisionNode"
-              icon="❓"
-              label="Decision"
-              color="bg-linear-to-br from-amber-600 to-orange-600"
-            />
+        <div className="absolute bottom-2 md:bottom-4 left-0 right-0 z-20 px-2 md:px-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-2 md:p-3 overflow-x-auto">
+            <div className="flex gap-2 md:gap-3 items-center min-w-max">
+              <span className="text-white font-bold text-xs md:text-sm whitespace-nowrap">
+                📦 Node Types:
+              </span>
+              <DraggableNodeCard
+                type="topicNode"
+                icon="🎯"
+                label="Topic"
+                color="bg-linear-to-br from-purple-600 to-pink-600"
+              />
+              <DraggableNodeCard
+                type="ideaNode"
+                icon="💡"
+                label="Idea"
+                color="bg-linear-to-br from-cyan-600 to-blue-600"
+              />
+              <DraggableNodeCard
+                type="processNode"
+                icon="⚙️"
+                label="Process"
+                color="bg-linear-to-br from-emerald-600 to-teal-600"
+              />
+              <DraggableNodeCard
+                type="decisionNode"
+                icon="❓"
+                label="Decision"
+                color="bg-linear-to-br from-amber-600 to-orange-600"
+              />
+            </div>
           </div>
         </div>
 
