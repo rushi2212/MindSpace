@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: mindspace-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://mind-space-c4eacmh0h-rushikeshs-projects-7882b715.vercel.app/api
+      - key: NODE_VERSION
+        value: "18"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
