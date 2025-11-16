@@ -75,13 +75,23 @@ const BrainCanvas = () => {
     img.src = imageData;
   };
 
+  const getCoordinates = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    // Handle both mouse and touch events
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
+  };
+
   const startDrawing = (e) => {
+    e.preventDefault(); // Prevent scrolling on touch
+    const { x, y } = getCoordinates(e);
+
     if (tool === "sticky") {
-      const rect = canvasRef.current.getBoundingClientRect();
-      setStickyPosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
+      setStickyPosition({ x, y });
       setShowStickyInput(true);
       return;
     }
@@ -89,9 +99,6 @@ const BrainCanvas = () => {
     setIsDrawing(true);
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
 
     // Set initial drawing properties
     if (tool === "eraser") {
@@ -109,12 +116,11 @@ const BrainCanvas = () => {
 
   const draw = (e) => {
     if (!isDrawing) return;
+    e.preventDefault(); // Prevent scrolling on touch
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getCoordinates(e);
 
     ctx.lineTo(x, y);
     ctx.stroke();
@@ -254,6 +260,9 @@ const BrainCanvas = () => {
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
           className="cursor-crosshair w-full"
           style={{ touchAction: "none" }}
         />

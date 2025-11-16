@@ -440,12 +440,14 @@ const MindMapBuilder = () => {
 
     return (
       <div
-        className={`${color} p-3 rounded-lg cursor-move hover:scale-105 transition-transform shadow-md`}
+        className={`${color} p-2 md:p-3 rounded-lg cursor-move hover:scale-105 transition-transform shadow-md min-w-max`}
         onDragStart={(event) => onDragStart(event, type)}
         draggable
       >
-        <div className="text-2xl mb-1">{icon}</div>
-        <div className="text-white text-sm font-semibold">{label}</div>
+        <div className="text-xl md:text-2xl mb-1">{icon}</div>
+        <div className="text-white text-xs md:text-sm font-semibold">
+          {label}
+        </div>
       </div>
     );
   };
@@ -453,19 +455,21 @@ const MindMapBuilder = () => {
   return (
     <div className="flex flex-col h-full w-full bg-slate-900">
       {/* Top Toolbar - AI Generator & Controls */}
-      <div className="bg-slate-800 border-b border-slate-700 p-4">
-        <div className="flex gap-4 items-start flex-wrap">
+      <div className="bg-slate-800 border-b border-slate-700 p-2 md:p-4">
+        <div className="flex gap-2 md:gap-4 items-start flex-wrap">
           {/* AI Mind Map Generator */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full md:w-auto">
             <div className="flex-1">
-              <h3 className="text-white font-bold text-sm mb-2">🤖 Generate</h3>
+              <h3 className="text-white font-bold text-xs md:text-sm mb-2">
+                🤖 Generate
+              </h3>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={aiTopic}
                   onChange={(e) => setAiTopic(e.target.value)}
                   placeholder="Enter topic..."
-                  className="px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-purple-500 focus:outline-none text-xs"
+                  className="px-2 md:px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-purple-500 focus:outline-none text-xs flex-1 min-w-0"
                   onKeyPress={(e) => {
                     if (e.key === "Enter" && !isGenerating) {
                       generateAIMindMap();
@@ -475,9 +479,12 @@ const MindMapBuilder = () => {
                 <button
                   onClick={generateAIMindMap}
                   disabled={isGenerating}
-                  className="px-3 py-2 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded hover:from-purple-700 hover:to-pink-700 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  className="px-2 md:px-3 py-2 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded hover:from-purple-700 hover:to-pink-700 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 >
-                  {isGenerating ? "🔄..." : "✨ Generate"}
+                  {isGenerating ? "🔄" : "✨"}
+                  <span className="hidden sm:inline ml-1">
+                    {isGenerating ? "..." : "Generate"}
+                  </span>
                 </button>
               </div>
             </div>
@@ -592,36 +599,40 @@ const MindMapBuilder = () => {
         </ReactFlow>
 
         {/* Bottom Toolbar - Node Types */}
-        <div className="absolute bottom-4 left-4 right-4 z-20 bg-slate-800 border border-slate-700 rounded-lg p-3 flex gap-3 flex-wrap items-center">
-          <span className="text-white font-bold text-sm">📦 Node Types:</span>
-          <DraggableNodeCard
-            type="topicNode"
-            icon="🎯"
-            label="Topic"
-            color="bg-linear-to-br from-purple-600 to-pink-600"
-          />
-          <DraggableNodeCard
-            type="ideaNode"
-            icon="💡"
-            label="Idea"
-            color="bg-linear-to-br from-cyan-600 to-blue-600"
-          />
-          <DraggableNodeCard
-            type="processNode"
-            icon="⚙️"
-            label="Process"
-            color="bg-linear-to-br from-emerald-600 to-teal-600"
-          />
-          <DraggableNodeCard
-            type="decisionNode"
-            icon="❓"
-            label="Decision"
-            color="bg-linear-to-br from-amber-600 to-orange-600"
-          />
+        <div className="absolute bottom-2 md:bottom-4 left-2 md:left-4 right-2 md:right-4 z-20 bg-slate-800 border border-slate-700 rounded-lg p-2 md:p-3 overflow-x-auto">
+          <div className="flex gap-2 md:gap-3 items-center min-w-max">
+            <span className="text-white font-bold text-xs md:text-sm whitespace-nowrap">
+              📦 Node Types:
+            </span>
+            <DraggableNodeCard
+              type="topicNode"
+              icon="🎯"
+              label="Topic"
+              color="bg-linear-to-br from-purple-600 to-pink-600"
+            />
+            <DraggableNodeCard
+              type="ideaNode"
+              icon="💡"
+              label="Idea"
+              color="bg-linear-to-br from-cyan-600 to-blue-600"
+            />
+            <DraggableNodeCard
+              type="processNode"
+              icon="⚙️"
+              label="Process"
+              color="bg-linear-to-br from-emerald-600 to-teal-600"
+            />
+            <DraggableNodeCard
+              type="decisionNode"
+              icon="❓"
+              label="Decision"
+              color="bg-linear-to-br from-amber-600 to-orange-600"
+            />
+          </div>
         </div>
 
         {/* Right Sidebar - Node Editor */}
-        <div className="absolute top-0 right-0 bottom-0 w-72 bg-slate-800 border-l border-slate-700 p-4 overflow-y-auto z-10">
+        <div className="hidden lg:block absolute top-0 right-0 bottom-0 w-72 bg-slate-800 border-l border-slate-700 p-4 overflow-y-auto z-10">
           <h3 className="text-white font-bold text-sm mb-4">✏️ Node Editor</h3>
 
           {selectedNode ? (
