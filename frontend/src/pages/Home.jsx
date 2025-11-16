@@ -111,7 +111,7 @@ const Home = () => (
     </div>
 
     {/* MindMap Builder Section - Full Width with Large Canvas */}
-    <div className="mb-12 w-full">
+    <div className="mb-12">
       <div className="card group mb-6 max-w-6xl mx-auto px-4">
         <div className="flex items-center gap-3">
           <div className="text-4xl">🗺️</div>
@@ -127,7 +127,7 @@ const Home = () => (
         </div>
       </div>
       <div
-        className="w-full rounded-xl overflow-hidden border border-purple-500/20 shadow-lg bg-slate-900"
+        className="max-w-6xl mx-auto px-4 rounded-xl overflow-hidden border border-purple-500/20 shadow-lg bg-slate-900"
         style={{ height: "700px" }}
       >
         <MindMapBuilder />

@@ -601,79 +601,116 @@ const MindMapBuilder = () => {
         </div>
 
         {/* Right Sidebar - Node Editor (Desktop Only) */}
-        <div className="hidden lg:block w-72 bg-slate-800 border-l border-slate-700 p-4 overflow-y-auto">
-          <h3 className="text-white font-bold text-sm mb-4">✏️ Node Editor</h3>
+        <div className="hidden lg:flex lg:flex-col w-72 bg-slate-800 border-l border-slate-700 overflow-y-auto">
+          {/* Node Types for Desktop */}
+          <div className="p-3 border-b border-slate-700">
+            <h3 className="text-white font-bold text-xs mb-2">📦 Node Types</h3>
+            <div className="space-y-2">
+              <DraggableNodeCard
+                type="topicNode"
+                icon="🎯"
+                label="Topic"
+                color="bg-linear-to-br from-purple-600 to-pink-600"
+              />
+              <DraggableNodeCard
+                type="ideaNode"
+                icon="💡"
+                label="Idea"
+                color="bg-linear-to-br from-cyan-600 to-blue-600"
+              />
+              <DraggableNodeCard
+                type="processNode"
+                icon="⚙️"
+                label="Process"
+                color="bg-linear-to-br from-emerald-600 to-teal-600"
+              />
+              <DraggableNodeCard
+                type="decisionNode"
+                icon="❓"
+                label="Decision"
+                color="bg-linear-to-br from-amber-600 to-orange-600"
+              />
+            </div>
+          </div>
 
-          {selectedNode ? (
-            <div className="space-y-4">
-              <div>
-                <label className="text-gray-300 text-xs block mb-2">
-                  Node Type
-                </label>
-                <div className="px-3 py-2 bg-slate-700 rounded text-gray-300 text-xs">
-                  {selectedNode.type}
+          {/* Node Editor */}
+          <div className="p-4 flex-1 overflow-y-auto">
+            <h3 className="text-white font-bold text-sm mb-4">
+              ✏️ Node Editor
+            </h3>
+
+            {selectedNode ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-gray-300 text-xs block mb-2">
+                    Node Type
+                  </label>
+                  <div className="px-3 py-2 bg-slate-700 rounded text-gray-300 text-xs">
+                    {selectedNode.type}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-gray-300 text-xs block mb-2">
+                    Label
+                  </label>
+                  <input
+                    type="text"
+                    value={nodeLabel}
+                    onChange={(e) => setNodeLabel(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-cyan-500 focus:outline-none text-xs"
+                    placeholder="Node label..."
+                  />
+                </div>
+
+                <div>
+                  <label className="text-gray-300 text-xs block mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={nodeDescription}
+                    onChange={(e) => setNodeDescription(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-cyan-500 focus:outline-none resize-none text-xs"
+                    rows="2"
+                    placeholder="Optional description..."
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={updateNode}
+                    className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 text-xs font-semibold"
+                  >
+                    ✓ Update
+                  </button>
+                  <button
+                    onClick={deleteNode}
+                    className="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-700 text-xs"
+                  >
+                    🗑️
+                  </button>
+                </div>
+
+                <div className="pt-4 border-t border-slate-700">
+                  <div className="text-gray-400 text-xs">
+                    <p>
+                      <strong>ID:</strong> {selectedNode.id}
+                    </p>
+                    <p className="mt-1">
+                      <strong>Pos:</strong> (
+                      {selectedNode.position.x.toFixed(0)},{" "}
+                      {selectedNode.position.y.toFixed(0)})
+                    </p>
+                  </div>
                 </div>
               </div>
-
-              <div>
-                <label className="text-gray-300 text-xs block mb-2">
-                  Label
-                </label>
-                <input
-                  type="text"
-                  value={nodeLabel}
-                  onChange={(e) => setNodeLabel(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-cyan-500 focus:outline-none text-xs"
-                  placeholder="Node label..."
-                />
+            ) : (
+              <div className="text-gray-400 text-xs text-center py-8">
+                <div className="text-2xl mb-2">👆</div>
+                <p>Click a node to edit</p>
               </div>
-
-              <div>
-                <label className="text-gray-300 text-xs block mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={nodeDescription}
-                  onChange={(e) => setNodeDescription(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-cyan-500 focus:outline-none resize-none text-xs"
-                  rows="2"
-                  placeholder="Optional description..."
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={updateNode}
-                  className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 text-xs font-semibold"
-                >
-                  ✓ Update
-                </button>
-                <button
-                  onClick={deleteNode}
-                  className="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-700 text-xs"
-                >
-                  🗑️
-                </button>
-              </div>
-
-              <div className="pt-4 border-t border-slate-700">
-                <div className="text-gray-400 text-xs">
-                  <p>
-                    <strong>ID:</strong> {selectedNode.id}
-                  </p>
-                  <p className="mt-1">
-                    <strong>Pos:</strong> ({selectedNode.position.x.toFixed(0)},{" "}
-                    {selectedNode.position.y.toFixed(0)})
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-gray-400 text-xs text-center py-8">
-              <div className="text-2xl mb-2">👆</div>
-              <p>Click a node to edit</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -711,11 +748,11 @@ const MindMapBuilder = () => {
         </div>
 
         {/* Node Editor */}
-        <div className="p-4 max-h-64 overflow-y-auto">
-          <h3 className="text-white font-bold text-sm mb-4">✏️ Node Editor</h3>
+        <div className="p-2 max-h-48 overflow-y-auto">
+          <h3 className="text-white font-bold text-xs mb-2">✏️ Node Editor</h3>
 
           {selectedNode ? (
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div>
                 <label className="text-gray-300 text-xs block mb-2">
                   Node Type
@@ -754,20 +791,20 @@ const MindMapBuilder = () => {
               <div className="flex gap-2">
                 <button
                   onClick={updateNode}
-                  className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 text-xs font-semibold"
+                  className="flex-1 px-3 py-1.5 bg-cyan-600 text-white rounded hover:bg-cyan-700 text-xs font-semibold"
                 >
                   ✓ Update
                 </button>
                 <button
                   onClick={deleteNode}
-                  className="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-700 text-xs"
+                  className="px-3 py-1.5 bg-rose-600 text-white rounded hover:bg-rose-700 text-xs"
                 >
                   🗑️
                 </button>
               </div>
             </div>
           ) : (
-            <div className="text-gray-400 text-xs text-center py-8">
+            <div className="text-gray-400 text-xs text-center py-4">
               <div className="text-2xl mb-2">👆</div>
               <p>Click a node to edit</p>
             </div>
