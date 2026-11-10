@@ -16,6 +16,7 @@ router = APIRouter(prefix="/api/ai", tags=["ai"])
 GEMINI_MODEL_DEFAULT = "gemini-2.5-pro"
 # Prefer SDXL as default; broadly supported on Inference API
 HF_DEFAULT_MODEL = "black-forest-labs/FLUX.1-schnell"
+CLOUDFLARE_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 
 
 async def gemini_chat(prompt: str) -> str:
@@ -92,6 +93,52 @@ async def hf_generate_image(prompt: str) -> str:
         raise HTTPException(502, detail=f"Hugging Face image generation failed for {model}: {message}") from e
 
 
+async def cloudflare_generate_image(prompt: str) -> str:
+    account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID", "").strip()
+    api_token = os.getenv("CLOUDFLARE_API_TOKEN", "").strip()
+    if not account_id or not api_token:
+        raise HTTPException(
+            500,
+            detail="Cloudflare image generation needs CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN configured on the backend.",
+        )
+
+    url = (
+        "https://api.cloudflare.com/client/v4/accounts/"
+        f"{account_id}/ai/run/{CLOUDFLARE_IMAGE_MODEL}"
+    )
+    try:
+        async with httpx.AsyncClient(timeout=120) as client:
+            response = await client.post(
+                url,
+                headers={"Authorization": f"Bearer {api_token}"},
+                json={"prompt": prompt},
+            )
+
+        if response.status_code >= 400:
+            try:
+                payload = response.json()
+                errors = payload.get("errors") or []
+                message = "; ".join(
+                    str(item.get("message", item)) if isinstance(item, dict) else str(item)
+                    for item in errors
+                ) or payload.get("message") or response.text
+            except ValueError:
+                message = response.text
+            raise HTTPException(
+                502, detail=f"Cloudflare image generation failed ({response.status_code}): {message}"
+            )
+
+        payload = response.json()
+        image = payload.get("result", {}).get("image")
+        if not image:
+            raise HTTPException(502, detail="Cloudflare returned no image data.")
+        return f"data:image/jpeg;base64,{image}"
+    except HTTPException:
+        raise
+    except httpx.HTTPError as e:
+        raise HTTPException(502, detail=f"Cloudflare image request failed: {e}") from e
+
+
 @router.post("/chat")
 async def chat(payload: Dict[str, str]):
     msg = payload.get("message")
@@ -117,7 +164,13 @@ async def art(payload: Dict[str, str]):
             f"</svg>"
         )
         return {"art": f"data:image/svg+xml;utf8,{svg}"}
-    data_url = await hf_generate_image(prompt)
+    provider = os.getenv("IMAGE_PROVIDER", "cloudflare").strip().lower()
+    if provider == "cloudflare":
+        data_url = await cloudflare_generate_image(prompt)
+    elif provider in {"huggingface", "hf"}:
+        data_url = await hf_generate_image(prompt)
+    else:
+        raise HTTPException(500, detail="IMAGE_PROVIDER must be 'cloudflare' or 'huggingface'.")
     return {"art": data_url}
 
 
@@ -129,6 +182,12 @@ async def health():
         "gemini": {
             "apiKeyPresent": bool(os.getenv("GEMINI_API_KEY")),
             "model": os.getenv("GEMINI_MODEL", GEMINI_MODEL_DEFAULT),
+        },
+        "imageProvider": os.getenv("IMAGE_PROVIDER", "cloudflare").strip().lower(),
+        "cloudflare": {
+            "accountIdPresent": bool(os.getenv("CLOUDFLARE_ACCOUNT_ID")),
+            "apiTokenPresent": bool(os.getenv("CLOUDFLARE_API_TOKEN")),
+            "model": CLOUDFLARE_IMAGE_MODEL,
         },
         "huggingface": {
             "apiKeyPresent": bool(os.getenv("HF_API_KEY") or os.getenv("HF_TOKEN")),

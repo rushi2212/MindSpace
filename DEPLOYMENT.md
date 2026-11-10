@@ -9,6 +9,10 @@
 
 ## Part 1: Deploy Backend to Render
 
+### Image generation on Cloudflare Workers AI
+
+MindSpace uses Cloudflare Workers AI FLUX.1 schnell by default. Create a Workers AI API token with Workers AI Read and Edit permissions, copy your Cloudflare Account ID, and set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in Render. Keep the Cloudflare account on the Workers Free plan to stay within its included daily allocation; generation will stop when that free quota is exhausted. Cloudflare documents a 10,000 Neuron daily free allocation. To use Hugging Face instead, set `IMAGE_PROVIDER=huggingface` and configure `HF_API_KEY`.
+
 ### Step 1: Sign in to Render
 Go to https://render.com and sign in with GitHub
 
@@ -37,7 +41,10 @@ Click **"Add Environment Variable"** for each:
 
 ```
 GEMINI_API_KEY=your_gemini_api_key_here
-HF_API_KEY=your_huggingface_key_here
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_API_TOKEN=your_cloudflare_workers_ai_token
+IMAGE_PROVIDER=cloudflare
+HF_API_KEY=optional_huggingface_token_for_alternative
 GROQ_API_KEY=your_groq_key_here
 GEMINI_MODEL=gemini-2.5-flash
 DB_URL=sqlite:///tmp/backend.db
