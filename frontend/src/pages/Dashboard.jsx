@@ -1,65 +1,21 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import TaskList from "../components/TaskList";
+import { Icon } from "../components/Icon";
 
 const Dashboard = () => {
-  const userId = "demo123"; // replace after login
-  const [stats, setStats] = useState({
-    total: 0,
-    completed: 0,
-    active: 0,
-    rate: 0,
-  });
-
+  const userId = "demo123";
+  const [stats, setStats] = useState({ total: 0, completed: 0, active: 0, rate: 0 });
   const updateStats = useCallback((tasks) => {
-    const completed = tasks.filter((t) => t.completed).length;
+    const completed = tasks.filter((task) => task.completed).length;
     const total = tasks.length;
-    const active = total - completed;
-    const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
-    setStats({ total, completed, active, rate });
+    setStats({ total, completed, active: total - completed, rate: total ? Math.round((completed / total) * 100) : 0 });
   }, []);
-
-  const handleTasksChange = useCallback(
-    (tasks) => {
-      updateStats(tasks);
-    },
-    [updateStats]
-  );
-  return (
-    <div className="max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="mb-12">
-        <h1 className="text-5xl font-bold mb-2 bg-linear-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">
-          📊 Productivity Dashboard
-        </h1>
-        <p className="text-gray-400">Stay organized and achieve your goals</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="card">
-          <div className="text-3xl font-bold text-emerald-400">
-            {stats.completed}
-          </div>
-          <p className="text-gray-400 text-sm mt-2">Tasks Completed</p>
-        </div>
-        <div className="card">
-          <div className="text-3xl font-bold text-purple-400">
-            {stats.active}
-          </div>
-          <p className="text-gray-400 text-sm mt-2">Active Tasks</p>
-        </div>
-        <div className="card">
-          <div className="text-3xl font-bold text-pink-400">{stats.rate}%</div>
-          <p className="text-gray-400 text-sm mt-2">Completion Rate</p>
-        </div>
-      </div>
-
-      {/* Tasks Section */}
-      <div className="card max-w-2xl mx-auto">
-        <TaskList userId={userId} onTasksChange={handleTasksChange} />
-      </div>
-    </div>
-  );
+  const handleTasksChange = useCallback((tasks) => updateStats(tasks), [updateStats]);
+  return <div className="page-wrap dashboard-page">
+    <header className="page-heading"><div><div className="eyebrow">A GENTLE PLAN FOR WHAT’S NEXT</div><h1>My Dashboard</h1><p>Keep your tasks moving while your ideas take shape.</p></div><span className="dashboard-date">{new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}</span></header>
+    <div className="stat-grid"><article className="stat-card"><span className="stat-icon stat-violet"><Icon name="library"/></span><span className="stat-value">{stats.total}</span><span className="stat-label">Total tasks</span></article><article className="stat-card"><span className="stat-icon stat-cyan"><Icon name="sparkle"/></span><span className="stat-value">{stats.active}</span><span className="stat-label">Still in motion</span></article><article className="stat-card"><span className="stat-icon stat-green"><Icon name="chart"/></span><span className="stat-value">{stats.rate}<small>%</small></span><span className="stat-label">Completion rate</span></article></div>
+    <section className="dashboard-task-panel"><div className="section-heading compact-heading"><div><div className="eyebrow">YOUR TASKS</div><h2>Make a little progress</h2></div><span className="task-count-pill">{stats.completed} of {stats.total} complete</span></div><TaskList userId={userId} onTasksChange={handleTasksChange}/></section>
+    <div className="dashboard-note"><Icon name="help" size={16}/><span>Tasks are stored by the existing backend under the demo workspace identifier. This project does not have sign-in yet.</span></div>
+  </div>;
 };
-
 export default Dashboard;

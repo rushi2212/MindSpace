@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useMemo } from "react";
+import React, { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -109,7 +109,7 @@ const getLayoutedElements = (nodes, edges, direction = "TB") => {
   return { nodes: layoutedNodes, edges };
 };
 
-const MindMapBuilder = () => {
+const MindMapBuilder = ({ initialTopic = "" }) => {
   const reactFlowWrapper = useRef(null);
   const nodeTypes = useMemo(
     () => ({
@@ -140,7 +140,8 @@ const MindMapBuilder = () => {
   const [nodeDescription, setNodeDescription] = useState("");
 
   // AI generation state
-  const [aiTopic, setAiTopic] = useState("");
+  const [aiTopic, setAiTopic] = useState(initialTopic);
+  useEffect(() => { if (initialTopic) setAiTopic(initialTopic); }, [initialTopic]);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const onConnect = useCallback(

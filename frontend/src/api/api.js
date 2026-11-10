@@ -24,3 +24,5 @@ export const addTask = ({ title, user_id }) =>
 // Send empty JSON body so FastAPI parses it and toggles when no fields provided
 export const toggleTask = (id) => API.put(`/tasks/${id}`, {});
 export const deleteTask = (id) => API.delete(`/tasks/${id}`);
+
+export const fetchAIHealth = () => API.get("/ai/health");

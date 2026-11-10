@@ -1,43 +1,69 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, NavLink, Link, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import StudioPage from "./pages/StudioPage";
+import Explore from "./pages/Explore";
+import Creations from "./pages/Creations";
+import Activity from "./pages/Activity";
+import Workflows from "./pages/Workflows";
+import Settings from "./pages/Settings";
+import CreationsProvider from "./components/CreationsContext";
+import { Icon } from "./components/Icon";
 
-const Icon = ({ name }) => {
-  const paths = {
-    home: <><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-6h6v6"/></>,
-    chart: <><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 6-7"/></>,
-    sparkle: <><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z"/><path d="m19 14 1.2 2.8L23 18l-2.8 1.2L19 22l-1.2-2.8L15 18l2.8-1.2L19 14Z"/></>,
-  };
-  return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
-};
+const navGroups = [
+  { label: "Workspace", items: [{ to: "/", icon: "home", title: "Home" }, { to: "/explore", icon: "explore", title: "Explore" }, { to: "/creations", icon: "library", title: "My Creations" }, { to: "/activity", icon: "clock", title: "Recent Activity" }] },
+  { label: "AI Studio", items: [{ to: "/studio/chat", icon: "chat", title: "AI Chat" }, { to: "/studio/image", icon: "image", title: "Image Studio" }, { to: "/studio/audio", icon: "audio", title: "Audio Studio" }, { to: "/studio/mindmap", icon: "map", title: "Mind Map Studio" }, { to: "/studio/canvas", icon: "canvas", title: "Idea Canvas" }] },
+];
 
-const App = () => (
-  <BrowserRouter>
-    <div className="app-shell">
-      <aside className="sidebar">
-        <Link to="/" className="brand-lockup">
-          <span className="brand-mark"><Icon name="sparkle" /></span>
-          <span className="brand-name">MindSpace<span>CREATIVE WORKSPACE</span></span>
-        </Link>
-        <div className="nav-caption">WORKSPACE</div>
-        <nav className="side-nav" aria-label="Main navigation">
-          <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}><Icon name="home"/><span>Creative studio</span></NavLink>
-          <NavLink to="/dashboard" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}><Icon name="chart"/><span>My dashboard</span></NavLink>
-        </nav>
-        <div className="sidebar-bottom"><span className="online-dot"/>Your ideas, in one place</div>
-      </aside>
-      <div className="main-shell">
-        <header className="topbar">
-          <div className="breadcrumb"><span>MindSpace</span><span className="crumb-divider">/</span><span className="crumb-current">Workspace</span></div>
-          <div className="topbar-status"><span className="online-dot"/>AI workspace</div>
-        </header>
-        <main className="page-content">
-          <Routes><Route path="/" element={<Home />} /><Route path="/dashboard" element={<Dashboard />} /></Routes>
-        </main>
+function AppShell() {
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  const pageName = [...navGroups.flatMap((group) => group.items), { to: "/dashboard", title: "My Dashboard" }, { to: "/workflows", title: "Workflow Builder" }, { to: "/settings", title: "Settings & help" }].find((item) => item.to === location.pathname)?.title || ({
+    "/studio/chat": "AI Chat",
+    "/studio/image": "Image Studio",
+    "/studio/audio": "Audio Studio",
+    "/studio/mindmap": "Mind Map Studio",
+    "/studio/canvas": "Idea Canvas",
+  }[location.pathname] || "Mindpace");
+
+  return <div className={`app-shell${collapsed ? " sidebar-collapsed" : ""}`}>
+    {mobileOpen && <button className="mobile-scrim" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
+    <aside className={`sidebar${mobileOpen ? " mobile-open" : ""}`}>
+      <Link to="/" className="brand-lockup" onClick={() => setMobileOpen(false)}>
+        <span className="brand-mark"><Icon name="sparkle" size={22}/></span>
+        <span className="brand-name">Mindpace<span>YOUR CREATIVE SPACE</span></span>
+      </Link>
+      <button className="collapse-button" title={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => setCollapsed(!collapsed)}><Icon name="panel"/></button>
+      <nav className="sidebar-nav" aria-label="Main navigation">
+        {navGroups.map((group) => <div className="nav-group" key={group.label}>
+          <div className="nav-caption">{group.label}</div>
+          {group.items.map((item) => <NavLink key={item.to} to={item.to} end={item.to === "/"} title={collapsed ? item.title : undefined} onClick={() => setMobileOpen(false)} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}><Icon name={item.icon}/><span>{item.title}</span></NavLink>)}
+        </div>)}
+        <div className="nav-group">
+          <div className="nav-caption">More</div>
+          <NavLink to="/workflows" title={collapsed ? "Workflow Builder" : undefined} onClick={() => setMobileOpen(false)} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}><Icon name="sparkle"/><span>Workflow Builder</span><span className="nav-soon">Preview</span></NavLink>
+          <NavLink to="/dashboard" title={collapsed ? "My Dashboard" : undefined} onClick={() => setMobileOpen(false)} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}><Icon name="chart"/><span>My Dashboard</span></NavLink>
+        </div>
+      </nav>
+      <div className="sidebar-bottom">
+        <NavLink to="/settings" title={collapsed ? "Settings & help" : undefined} onClick={() => setMobileOpen(false)} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}><Icon name="settings"/><span>Settings & help</span></NavLink>
+        <div className="profile-card"><div className="profile-avatar">M</div><div className="profile-copy"><strong>Local workspace</strong><span>No account connected</span></div><span className="profile-menu">···</span></div>
       </div>
+    </aside>
+    <div className="main-shell">
+      <header className="topbar">
+        <button className="mobile-menu" aria-label="Open navigation" onClick={() => setMobileOpen(true)}><Icon name="menu"/></button>
+        <div className="breadcrumb"><Link to="/">Mindpace</Link><span className="crumb-divider">/</span><span className="crumb-current">{pageName}</span></div>
+        <div className="topbar-right"><span className="workspace-status"><span className="online-dot"/> Workspace ready</span><Link className="topbar-avatar" to="/settings" title="Local workspace settings">M</Link></div>
+      </header>
+      <main className="page-content"><Routes>
+        <Route path="/" element={<Home/>}/><Route path="/explore" element={<Explore/>}/><Route path="/creations" element={<Creations/>}/><Route path="/activity" element={<Activity/>}/><Route path="/studio/:tool" element={<StudioPage/>}/><Route path="/workflows" element={<Workflows/>}/><Route path="/dashboard" element={<Dashboard/>}/><Route path="/settings" element={<Settings/>}/><Route path="*" element={<Home/>}/>
+      </Routes></main>
     </div>
-  </BrowserRouter>
-);
+  </div>;
+}
 
+const App = () => <BrowserRouter><CreationsProvider><AppShell/></CreationsProvider></BrowserRouter>;
 export default App;

@@ -1,143 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { generateAudio } from "../api/api";
+import { Icon } from "./Icon";
 
-const AudioGenerator = () => {
-  const [text, setText] = useState("");
+const AudioGenerator = ({ initialPrompt = "", onGenerated }) => {
+  const [text, setText] = useState(initialPrompt);
   const [audio, setAudio] = useState(null);
   const [generatedText, setGeneratedText] = useState(null);
   const [originalPrompt, setOriginalPrompt] = useState(null);
   const [generateContent, setGenerateContent] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  useEffect(() => { if (initialPrompt) setText(initialPrompt); }, [initialPrompt]);
 
   const handleGenerate = async () => {
-    if (!text.trim()) {
-      setError("Please enter text for audio generation");
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    setAudio(null);
-    setGeneratedText(null);
-    setOriginalPrompt(null);
-
+    if (!text.trim()) { setError("Enter a topic or text to continue."); return; }
+    setLoading(true); setError(null); setAudio(null); setGeneratedText(null); setOriginalPrompt(null);
     try {
-      const res = await generateAudio(text, {
-        generateContent,
-      });
-      setAudio(res.data.audio);
-      setGeneratedText(res.data.text);
-      setOriginalPrompt(res.data.prompt);
-    } catch (e) {
-      setError(
-        e.response?.data?.detail || e.message || "Audio generation failed"
-      );
-    } finally {
-      setLoading(false);
-    }
+      const res = await generateAudio(text, { generateContent });
+      setAudio(res.data.audio); setGeneratedText(res.data.text); setOriginalPrompt(res.data.prompt);
+      await onGenerated?.({ audio: res.data.audio, transcript: res.data.text, prompt: res.data.prompt });
+    } catch (e) { setError(e.response?.data?.detail || e.message || "Audio generation failed"); }
+    finally { setLoading(false); }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !loading) {
-      handleGenerate();
-    }
-  };
-
-  return (
-    <div className="w-full">
-      <div className="mb-6">
-        <h3 className="text-xl font-bold text-gray-100 mb-2">
-          🎵 Audio Generator
-        </h3>
-        <p className="text-gray-400 text-sm">
-          {generateContent
-            ? "Generate creative content with AI and convert to speech (like Suno)"
-            : "Convert text to natural-sounding speech"}
-        </p>
-      </div>
-
-      <div className="mb-4">
-        <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
-          <input
-            type="checkbox"
-            checked={generateContent}
-            onChange={(e) => setGenerateContent(e.target.checked)}
-            className="w-4 h-4 rounded border-gray-500 bg-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900"
-          />
-          <span>
-            Generate content with AI (e.g., "write a poem about the ocean")
-          </span>
-        </label>
-      </div>
-
-      <div className="flex gap-2 mb-4">
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="input-field flex-1"
-          placeholder={
-            generateContent
-              ? "Enter a topic or creative prompt..."
-              : "Enter text to convert to speech..."
-          }
-          disabled={loading}
-        />
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !text.trim()}
-          className="btn-success disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? "Generating..." : "Generate"}
-        </button>
-      </div>
-
-      {error && (
-        <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded text-rose-300 text-sm">
-          ❌ {error}
-        </div>
-      )}
-
-      {audio && (
-        <div className="space-y-4">
-          {/* Show generated content if AI was used */}
-          {generatedText && generatedText !== originalPrompt && (
-            <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-4">
-              <p className="text-emerald-400 font-semibold text-sm mb-2">
-                ✨ Generated Content:
-              </p>
-              <p className="text-gray-300 text-sm mb-2 whitespace-pre-wrap leading-relaxed">
-                {generatedText}
-              </p>
-              {originalPrompt && (
-                <p className="text-gray-500 text-xs mt-3 pt-3 border-t border-slate-600/50">
-                  Prompt: "{originalPrompt}"
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Audio player */}
-          <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-4">
-            <p className="text-gray-300 text-sm mb-3">🎧 Audio:</p>
-            <audio
-              controls
-              src={audio}
-              className="w-full rounded"
-              style={{ height: "40px" }}
-            />
-            <a
-              href={audio}
-              download="generated-audio.mp3"
-              className="mt-2 inline-block text-emerald-400 hover:text-emerald-300 text-sm"
-            >
-              📥 Download Audio
-            </a>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  return <div className="audio-generator">
+    <label className="field-label" htmlFor="audio-prompt">{generateContent ? "TOPIC OR CREATIVE PROMPT" : "TEXT TO SPEAK"}</label>
+    <textarea id="audio-prompt" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") handleGenerate(); }} className="studio-prompt" rows={4} placeholder={generateContent ? "A hopeful short poem about starting over…" : "Paste the text you would like spoken…"} disabled={loading}/>
+    <div className="audio-controls"><label className="toggle-control"><input type="checkbox" checked={generateContent} onChange={(e) => setGenerateContent(e.target.checked)} disabled={loading}/><span className="toggle-track"/><span>Write a short script with AI first</span></label><button className="button button-primary generate-button" onClick={handleGenerate} disabled={loading || !text.trim()}>{loading ? <><span className="spinner"/> Creating audio…</> : <><Icon name="audio" size={17}/> Generate speech audio</>}</button></div>
+    <div className="generation-note">Current backend creates spoken narration with gTTS. It does not compose songs or instrumental music.</div>
+    {error && <div className="error-box"><Icon name="help" size={17}/><span>{error}</span></div>}
+    {audio && <div className="audio-output">{generatedText && generatedText !== originalPrompt && <div className="generated-script"><div className="eyebrow">GENERATED SCRIPT</div><p>{generatedText}</p></div>}<div className="audio-player-card"><div className="audio-player-symbol"><Icon name="audio" size={21}/></div><div className="audio-player-main"><div><strong>Spoken audio</strong><span>{generateContent ? "AI-written script" : "Your text"}</span></div><audio controls src={audio}/></div><a className="download-icon" href={audio} download="mindpace-audio.mp3" aria-label="Download audio"><Icon name="download" size={17}/></a></div></div>}
+  </div>;
 };
-
 export default AudioGenerator;
