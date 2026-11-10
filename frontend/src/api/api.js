@@ -1,7 +1,10 @@
 import axios from "axios";
 
-// Use environment variable for API URL, fallback to localhost for development
-const API_BASE_URL = "https://mindspace-r3fh.onrender.com/api";
+// Local development uses Vite's proxy to avoid browser CORS restrictions.
+// Production can override the backend URL with VITE_API_URL.
+const API_BASE_URL = import.meta.env.DEV
+  ? "/api"
+  : import.meta.env.VITE_API_URL || "https://mindspace-r3fh.onrender.com/api";
 
 const API = axios.create({ baseURL: API_BASE_URL });
 

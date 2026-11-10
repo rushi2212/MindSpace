@@ -14,6 +14,7 @@ const ArtGenerator = () => {
       setArt(res.data.art);
     } catch (error) {
       const msg =
+        error?.response?.data?.detail ||
         error?.response?.data?.error ||
         error.message ||
         "Unable to generate art. Please try again.";

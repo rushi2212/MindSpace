@@ -5,165 +5,44 @@ import AudioGenerator from "../components/AudioGenerator";
 import BrainCanvas from "../components/BrainCanvas";
 import MindMapBuilder from "../components/MindMapBuilder";
 
+const ToolHeading = ({ number, title, description, id }) => (
+  <div className="tool-heading" id={id}>
+    <span className="tool-number">{number}</span>
+    <div><h2>{title}</h2><p>{description}</p></div>
+  </div>
+);
+
 const Home = () => (
-  <div className="w-full">
-    {/* Enhanced Hero Section */}
-    <div className="text-center mb-16 max-w-6xl mx-auto px-4">
-      <div className="mb-8">
-        <h1 className="text-6xl font-black mb-3 bg-linear-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-          Welcome to MindSpace
-        </h1>
-        <p className="text-sm text-purple-400 font-bold tracking-widest uppercase mb-6">
-          🧠 Neural Workspace for Creators
-        </p>
+  <div className="studio-page">
+    <section className="welcome-banner">
+      <div className="welcome-copy">
+        <div className="eyebrow"><span className="eyebrow-line"/> YOUR CREATIVE STUDIO</div>
+        <h1>Make room for<br/><span>big ideas.</span></h1>
+        <p>Think, create, and bring your next idea to life with a little help from AI.</p>
+        <a className="welcome-action" href="#tools">Explore your tools <span aria-hidden="true">↓</span></a>
       </div>
-      <p className="text-xl text-gray-300 mb-4 max-w-2xl mx-auto leading-relaxed">
-        Your AI-powered creative companion for ideas, art, audio, and visual
-        thinking
-      </p>
-      <p className="text-sm text-gray-400 mb-8">
-        ✨ Chat • Draw • Create • Visualize • Generate
-      </p>
-      {/* Feature Pills */}
-      <div className="flex flex-wrap justify-center gap-3 mb-8">
-        {[
-          "AI Chat",
-          "Art Generation",
-          "Audio Creation",
-          "Whiteboard",
-          "Mind Maps",
-        ].map((feature) => (
-          <span
-            key={feature}
-            className="px-4 py-2 rounded-full bg-purple-600/20 border border-purple-500/40 text-purple-300 text-sm font-medium hover:bg-purple-600/30 transition-colors"
-          >
-            {feature}
-          </span>
-        ))}
-      </div>{" "}
-    </div>
+      <div className="welcome-art" aria-hidden="true">
+        <div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="orbit-core"><span>m</span></div>
+        <span className="orbit-dot dot-a"/><span className="orbit-dot dot-b"/><span className="orbit-dot dot-c"/>
+        <div className="orbit-note note-one">IDEAS</div><div className="orbit-note note-two">CREATE</div>
+      </div>
+      <div className="banner-foot"><span>01 — 05</span><span>YOUR TOOLS, READY WHEN YOU ARE</span></div>
+    </section>
 
-    {/* Content Grid - Chat & Art */}
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 max-w-6xl mx-auto px-4">
-      {/* Chat Section */}
-      <div className="card group">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="text-4xl">💬</div>
-          <div>
-            <h2 className="text-2xl font-bold bg-linear-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
-              AI Chat
-            </h2>
-            <p className="text-gray-400 text-sm mt-1">
-              Talk with your intelligent AI companion
-            </p>
-          </div>
-        </div>
-        <ChatBoxClean />
-      </div>
+    <div className="section-intro" id="tools"><div><div className="eyebrow">THE TOOLKIT</div><h2>Choose a starting point</h2></div><p>Pick a tool and follow your curiosity.</p></div>
 
-      {/* Art Generator Section */}
-      <div className="card group">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="text-4xl">🎨</div>
-          <div>
-            <h2 className="text-2xl font-bold bg-linear-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">
-              Art Generator
-            </h2>
-            <p className="text-gray-400 text-sm mt-1">
-              Create stunning visuals with AI
-            </p>
-          </div>
-        </div>
-        <ArtGenerator />
-      </div>
-    </div>
+    <section className="tool-grid" aria-label="Creative tools">
+      <article className="tool-card chat-card"><ToolHeading number="01" title="AI conversation" description="Work through a thought, question, or rough idea." id="chat"/><ChatBoxClean/></article>
+      <article className="tool-card art-card"><ToolHeading number="02" title="Image studio" description="Turn a description into a one-of-a-kind image." id="art"/><ArtGenerator/></article>
+      <article className="tool-card audio-card"><ToolHeading number="03" title="Audio maker" description="Shape a script or idea into spoken audio." id="audio"/><AudioGenerator/></article>
+      <article className="tool-card canvas-card"><ToolHeading number="04" title="Open canvas" description="Sketch freely, gather notes, and map out your thinking." id="canvas"/><BrainCanvas/></article>
+    </section>
 
-    {/* Audio Generator Section */}
-    <div className="card group mb-12 max-w-6xl mx-auto px-4">
-      <div className="mb-4 flex items-center gap-3">
-        <div className="text-4xl">🎵</div>
-        <div>
-          <h2 className="text-2xl font-bold bg-linear-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-            Audio Generator
-          </h2>
-          <p className="text-gray-400 text-sm mt-1">
-            Convert text to natural speech with AI-generated content
-          </p>
-        </div>
-      </div>
-      <AudioGenerator />
-    </div>
-
-    {/* BrainCanvas Section */}
-    <div className="card group mb-12 max-w-6xl mx-auto px-4">
-      <div className="mb-4 flex items-center gap-3">
-        <div className="text-4xl">✏️</div>
-        <div>
-          <h2 className="text-2xl font-bold bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-            BrainCanvas – AI Whiteboard
-          </h2>
-          <p className="text-gray-400 text-sm mt-1">
-            Draw freely, add notes, and sketch your ideas on a digital canvas
-          </p>
-        </div>
-      </div>
-      <BrainCanvas />
-    </div>
-
-    {/* MindMap Builder Section - Full Width with Large Canvas */}
-    <div className="mb-12">
-      <div className="card group mb-6 max-w-6xl mx-auto px-4">
-        <div className="flex items-center gap-3">
-          <div className="text-4xl">🗺️</div>
-          <div>
-            <h2 className="text-2xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              MindMap Builder
-            </h2>
-            <p className="text-gray-400 text-sm mt-1">
-              Create professional diagrams and mind maps with AI-powered
-              generation
-            </p>
-          </div>
-        </div>
-      </div>
-      <div
-        className="max-w-6xl mx-auto px-4 rounded-xl overflow-hidden border border-purple-500/20 shadow-lg bg-slate-900"
-        style={{ height: "700px" }}
-      >
-        <MindMapBuilder />
-      </div>
-    </div>
-
-    {/* Features Showcase */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 pb-12 max-w-6xl mx-auto px-4">
-      {[
-        {
-          icon: "⚡",
-          title: "Fast & Responsive",
-          desc: "Real-time AI responses and instant generation",
-        },
-        {
-          icon: "🎯",
-          title: "AI-Powered",
-          desc: "Advanced Gemini API for intelligent features",
-        },
-        {
-          icon: "🌟",
-          title: "Creative Suite",
-          desc: "All tools in one workspace",
-        },
-      ].map((feature) => (
-        <div key={feature.title} className="feature-card">
-          <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
-            {feature.icon}
-          </div>
-          <h3 className="font-semibold text-lg mb-2 text-white">
-            {feature.title}
-          </h3>
-          <p className="text-gray-400 text-sm">{feature.desc}</p>
-        </div>
-      ))}
-    </div>
+    <section className="mindmap-section">
+      <div className="mindmap-header"><div><div className="eyebrow">VISUAL THINKING</div><h2>Build a mind map</h2><p>Turn a topic into a connected map of ideas and possibilities.</p></div><span className="mindmap-index">05 / MIND MAP</span></div>
+      <div className="mindmap-frame"><MindMapBuilder/></div>
+    </section>
+    <footer className="studio-footer"><span>MindSpace</span><span>A little space to think out loud.</span></footer>
   </div>
 );
 

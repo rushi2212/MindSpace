@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useMemo } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -53,13 +53,6 @@ const DecisionNode = ({ data }) => (
     )}
   </div>
 );
-
-const nodeTypes = {
-  topicNode: TopicNode,
-  ideaNode: IdeaNode,
-  processNode: ProcessNode,
-  decisionNode: DecisionNode,
-};
 
 // Auto-layout using dagre
 const getLayoutedElements = (nodes, edges, direction = "TB") => {
@@ -118,6 +111,24 @@ const getLayoutedElements = (nodes, edges, direction = "TB") => {
 
 const MindMapBuilder = () => {
   const reactFlowWrapper = useRef(null);
+  const nodeTypes = useMemo(
+    () => ({
+      topicNode: TopicNode,
+      ideaNode: IdeaNode,
+      processNode: ProcessNode,
+      decisionNode: DecisionNode,
+    }),
+    []
+  );
+  const defaultEdgeOptions = useMemo(
+    () => ({
+      type: "smoothstep",
+      animated: true,
+      style: { stroke: "#64748b", strokeWidth: 2 },
+      markerEnd: { type: MarkerType.ArrowClosed, color: "#64748b" },
+    }),
+    []
+  );
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
@@ -565,17 +576,11 @@ const MindMapBuilder = () => {
             onDragOver={onDragOver}
             onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
-            defaultEdgeOptions={{
-              type: "smoothstep",
-              animated: true,
-              style: { stroke: "#64748b", strokeWidth: 2 },
-              markerEnd: { type: MarkerType.ArrowClosed, color: "#64748b" },
-            }}
+            defaultEdgeOptions={defaultEdgeOptions}
             fitView
             fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
             minZoom={0.1}
             maxZoom={2}
-            defaultZoom={0.8}
             className="bg-slate-900"
           >
             <Background color="#334155" gap={16} />
