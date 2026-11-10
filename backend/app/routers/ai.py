@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 GEMINI_MODEL_DEFAULT = "gemini-2.5-pro"
 # Prefer SDXL as default; broadly supported on Inference API
-HF_DEFAULT_MODEL = "stabilityai/stable-diffusion-xl-base-1.0"
+HF_DEFAULT_MODEL = "black-forest-labs/FLUX.1-schnell"
 
 
 async def gemini_chat(prompt: str) -> str:
@@ -53,117 +53,43 @@ async def gemini_chat(prompt: str) -> str:
 
 
 async def hf_generate_image(prompt: str) -> str:
-    api_key = os.getenv("HF_API_KEY")
+    api_key = os.getenv("HF_API_KEY") or os.getenv("HF_TOKEN")
     if not api_key:
-        raise HTTPException(500, detail="HF_API_KEY not configured")
-
-    configured = (os.getenv("HF_MODEL") or HF_DEFAULT_MODEL).strip()
-
-    # Try using huggingface_hub InferenceClient first if available
-    if InferenceClient:
-        try:
-            client = InferenceClient(api_key=api_key)
-            img = client.text_to_image(prompt=prompt, model=configured)
-
-            # Convert PIL Image or bytes to base64 data URL
-            if hasattr(img, "save"):
-                buf = BytesIO()
-                img.save(buf, format="PNG")
-                image_bytes = buf.getvalue()
-            elif isinstance(img, (bytes, bytearray)):
-                image_bytes = bytes(img)
-            else:
-                raise RuntimeError("Unexpected image type from HF client")
-
-            b64 = base64.b64encode(image_bytes).decode("utf-8")
-            return f"data:image/png;base64,{b64}"
-        except Exception as e:
-            # Fall back to HTTP requests approach
-            pass
-
-    # Fallback to HTTP requests approach
-    allow_fallback = os.getenv("HF_ALLOW_FALLBACK", "true").lower() != "false"
-    # Updated, reliable fallbacks (as of 2025): SDXL, SDXL Turbo, FLUX schnell, SD 1.5
-    fallbacks = [
-        "stabilityai/sdxl-turbo",
-        "black-forest-labs/FLUX.1-schnell",
-        "runwayml/stable-diffusion-v1-5",
-    ]
-    candidates = []
-    for m in [configured, *(fallbacks if allow_fallback else [])]:
-        if m not in candidates:
-            candidates.append(m)
-
-    async def attempt(model: str) -> Dict[str, Any]:
-        # Try the task-specific pipeline endpoint first, then fall back to the generic models endpoint
-        endpoints = [
-            f"https://api-inference.huggingface.co/pipeline/text-to-image/{model}",
-            f"https://api-inference.huggingface.co/models/{model}",
-        ]
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            # Accept any image; we'll infer type from response
-            "Accept": "image/*",
-            "Content-Type": "application/json",
-        }
-
-        async with httpx.AsyncClient(timeout=120) as client:
-            last_resp: httpx.Response | None = None
-            for url in endpoints:
-                r = await client.post(url, headers=headers, json={"inputs": prompt})
-                last_resp = r
-                # If warming up, retry once
-                if r.status_code == 503:
-                    r = await client.post(url, headers=headers, json={"inputs": prompt})
-                ct = r.headers.get("content-type", "")
-                if r.status_code == 401:
-                    raise HTTPException(
-                        502, detail="Unauthorized: set HF_API_KEY correctly")
-                if r.status_code == 403:
-                    return {"ok": False, "reason": f"restricted: accept terms for {model}"}
-                if r.status_code == 404:
-                    # Try next endpoint if available; otherwise report not found
-                    continue
-                if 200 <= r.status_code < 300 and "image" in ct:
-                    mime = ct.split(";")[0].strip() or "image/png"
-                    b64 = base64.b64encode(r.content).decode("utf-8")
-                    return {"ok": True, "data_url": f"data:{mime};base64,{b64}", "model": model}
-                # Non-image successful responses sometimes include JSON with errors
-                try:
-                    data = r.json()
-                    msg = data.get("error") or data.get(
-                        "message") or f"HTTP {r.status_code}"
-                    return {"ok": False, "reason": msg}
-                except Exception:
-                    return {"ok": False, "reason": f"HTTP {r.status_code}"}
-
-        # If both endpoints 404'd
-        return {"ok": False, "reason": f"not-found or unsupported on Inference API: {model}"}
-
-    reasons = []
-    for m in candidates:
-        res = await attempt(m)
-        if res.get("ok"):
-            return res["data_url"]
-        reasons.append(f"{m}: {res.get('reason')}")
-
-    placeholder = os.getenv("HF_PLACEHOLDER_ON_FAIL",
-                            "false").lower() == "true"
-    if placeholder:
-        prompt_s = prompt.replace("<", "&lt;").replace(">", "&gt;")
-        reasons_s = "; ".join(reasons).replace(
-            "<", "&lt;").replace(">", "&gt;")
-        svg = (
-            f"<svg xmlns='http://www.w3.org/2000/svg' width='768' height='480'>"
-            f"<rect width='100%' height='100%' fill='#111827'/>"
-            f"<text x='50%' y='45%' dominant-baseline='middle' text-anchor='middle' fill='#e5e7eb' font-size='20' font-family='sans-serif'>{prompt_s}</text>"
-            f"<text x='50%' y='60%' dominant-baseline='middle' text-anchor='middle' fill='#9ca3af' font-size='14' font-family='sans-serif'>{reasons_s}</text>"
-            f"</svg>"
+        raise HTTPException(
+            500, detail="HF_API_KEY is not configured on the backend (a Hugging Face token with Inference Providers permission is required)."
         )
-        return f"data:image/svg+xml;utf8,{svg}"
+    if InferenceClient is None:
+        raise HTTPException(500, detail="huggingface_hub is not installed on the backend.")
 
-    raise HTTPException(
-        502, detail=f"HF failed for all candidates. Reasons: {'; '.join(reasons)}")
+    model = (os.getenv("HF_MODEL") or HF_DEFAULT_MODEL).strip()
+    try:
+        # Hugging Face routes current text-to-image models through Inference Providers.
+        # Run its synchronous client off the event loop so requests don't block other API calls.
+        import asyncio
+
+        def generate():
+            client = InferenceClient(provider="auto", api_key=api_key, timeout=120)
+            return client.text_to_image(prompt=prompt, model=model)
+
+        img = await asyncio.to_thread(generate)
+        if hasattr(img, "save"):
+            buf = BytesIO()
+            img.save(buf, format="PNG")
+            image_bytes = buf.getvalue()
+        elif isinstance(img, (bytes, bytearray)):
+            image_bytes = bytes(img)
+        else:
+            raise RuntimeError("Hugging Face returned an unexpected image format")
+
+        b64 = base64.b64encode(image_bytes).decode("utf-8")
+        return f"data:image/png;base64,{b64}"
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Surface provider/token/model errors to the UI; legacy api-inference URLs
+        # return misleading 404s for models now served through Inference Providers.
+        message = str(e).strip() or e.__class__.__name__
+        raise HTTPException(502, detail=f"Hugging Face image generation failed for {model}: {message}") from e
 
 
 @router.post("/chat")
@@ -205,7 +131,7 @@ async def health():
             "model": os.getenv("GEMINI_MODEL", GEMINI_MODEL_DEFAULT),
         },
         "huggingface": {
-            "apiKeyPresent": bool(os.getenv("HF_API_KEY")),
+            "apiKeyPresent": bool(os.getenv("HF_API_KEY") or os.getenv("HF_TOKEN")),
             "model": os.getenv("HF_MODEL", HF_DEFAULT_MODEL),
             "allowFallback": os.getenv("HF_ALLOW_FALLBACK", "true").lower() != "false",
         },
